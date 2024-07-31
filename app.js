@@ -31,7 +31,7 @@ function speak(text) {
     text_speak.pitch = 1;
     window.speechSynthesis.speak(text_speak);
     addToHistory('JARVIS', text);
-} 
+}
 
 function wishMe() {
     let hour = new Date().getHours();
@@ -79,13 +79,26 @@ btn.addEventListener('click', () => {
 
 historyBtn.addEventListener('click', async () => {
     historyModal.style.display = 'block';
-    const interactions = await fetch('https://tell-some-crazy.onrender.com/interactions').then(res => res.json());
-    historyList.innerHTML = '';
-    interactions.forEach(interaction => {
-        const li = document.createElement('li');
-        li.textContent = `${interaction.speaker}: ${interaction.message}`;
-        historyList.appendChild(li);
-    });
+    try {
+        const interactions = await fetch('https://tell-some-crazy.onrender.com/interactions');
+        const raka = await interactions.json();
+        if (raka.ok) {
+            historyList.innerHTML = '';
+            raka.forEach(interaction => {
+                const li = document.createElement('li');
+                li.textContent = `${interaction.speaker}: ${interaction.message}`;
+                historyList.appendChild(li);
+            });
+        }
+        else {
+            const errorMessage = 'Data are not finding.';
+        }
+    }
+    catch (err) {
+        alert("Error Fetching Data's...");
+    }
+
+
 });
 
 commandsBtn.addEventListener('click', () => {
@@ -132,7 +145,7 @@ function takeCommand(message) {
         window.open(`https://www.google.com/search?q=${message.replace(" ", "+")}`, "_blank");
         speak("This is what I found on the internet regarding " + message);
     } else if (message.includes('wikipedia')) {
-        window.open(`https://en.wikipedia.org/wiki/${message.replace("wikipedia", "")}`, "_blank"); 
+        window.open(`https://en.wikipedia.org/wiki/${message.replace("wikipedia", "")}`, "_blank");
         speak("This is what I found on Wikipedia regarding " + message);
     } else if (message.includes('time')) {
         const time = new Date().toLocaleTimeString();
